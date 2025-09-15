@@ -44,7 +44,7 @@ export default function App() {
       <SearchBar onSubmit={handleSearch} />
 
       {loading && <Loader />}
-      {error && <ErrorMessage message={error} />}
+      {error ? <ErrorMessage message={error} /> : null}
 
       {!loading && !error && items.length === 0 && lastQuery && (
         <p>Nothing found for “{lastQuery}”.</p>
