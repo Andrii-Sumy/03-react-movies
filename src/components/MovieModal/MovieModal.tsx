@@ -28,9 +28,7 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
   };
 
   const bigSrc =
-    movie.backdrop ||
-    (movie.poster ? movie.poster.replace('/w300', '/w500') : '') ||
-    imgUrl(movie.backdrop_path, 'original') ||
+    imgUrl(movie.backdrop_path, 'w780') ||
     imgUrl(movie.poster_path, 'w500');
 
   return createPortal(
@@ -40,23 +38,13 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
           &times;
         </button>
 
-        {bigSrc ? (
-          <img src={bigSrc} alt={movie.title} className={css.image} />
-        ) : (
-          <div className={css.content} style={{ padding: 20 }}>
-            <h2>{movie.title}</h2>
-          </div>
-        )}
+        {bigSrc && <img src={bigSrc} alt={movie.title} className={css.image} />}
 
         <div className={css.content}>
           <h2>{movie.title}</h2>
           <p>{movie.overview || 'No overview available.'}</p>
-          <p>
-            <strong>Release Date:</strong> {movie.releaseDate || '—'}
-          </p>
-          <p>
-            <strong>Rating:</strong> {typeof movie.rating === 'number' ? movie.rating.toFixed(1) : '—'}/10
-          </p>
+          <p><strong>Release Date:</strong> {movie.release_date || '—'}</p>
+          <p><strong>Rating:</strong> {movie.vote_average.toFixed(1)}/10</p>
         </div>
       </div>
     </div>,
