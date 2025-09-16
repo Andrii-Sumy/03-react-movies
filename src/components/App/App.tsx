@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Toaster } from 'react-hot-toast';
 import styles from './App.module.css';
 
 import SearchBar from '../SearchBar/SearchBar';
@@ -11,7 +12,7 @@ import type { Movie } from '../../types/movie';
 import { fetchMovies } from '../../services/movieService';
 
 export default function App() {
-  const [items, setItems] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Movie | null>(null);
@@ -26,9 +27,9 @@ export default function App() {
       setLoading(true);
       setError(null);
       const results = await fetchMovies(q);
-      setItems(results);
+      setMovies(results);
     } catch (e: any) {
-      setItems([]);
+      setMovies([]);
       setError(e?.message || 'Unknown error');
     } finally {
       setLoading(false);
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <div className={styles.container}>
+      <Toaster position="top-right" /> { }
       <a href="https://www.themoviedb.org/" target="_blank" rel="noreferrer">
         Powered by TMDB
       </a>
@@ -46,12 +48,12 @@ export default function App() {
       {loading && <Loader />}
       {error ? <ErrorMessage message={error} /> : null}
 
-      {!loading && !error && items.length === 0 && lastQuery && (
+      {!loading && !error && movies.length === 0 && lastQuery && (
         <p>Nothing found for “{lastQuery}”.</p>
       )}
 
-      {!loading && !error && items.length > 0 && (
-        <MovieGrid items={items} onSelect={setSelected} resetKey={lastQuery} />
+      {!loading && !error && movies.length > 0 && (
+        <MovieGrid movies={movies} onSelect={setSelected} />
       )}
 
       {selected && <MovieModal movie={selected} onClose={() => setSelected(null)} />}

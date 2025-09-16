@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './MovieGrid.module.css';
 import type { Movie } from '../../types/movie';
+import { imgUrl } from '../../services/movieService';
 
-type Props = {
-  items: Movie[];
-  onSelect?: (m: Movie) => void;
-  resetKey?: string;
-};
+export interface MovieGridProps {
+  movies: Movie[];
+  onSelect: (m: Movie) => void;
+}
 
 const PAGE_SIZE = 15;
 
-export default function MovieGrid({ items, onSelect, resetKey }: Props) {
+export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
   const [count, setCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { setCount(PAGE_SIZE); }, [resetKey, items]);
+  useEffect(() => { setCount(PAGE_SIZE); }, [movies]);
 
-  const visible = useMemo(() => items.slice(0, count), [items, count]);
+  const visible = useMemo(() => movies.slice(0, count), [movies, count]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -24,22 +24,21 @@ export default function MovieGrid({ items, onSelect, resetKey }: Props) {
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setCount((c) => Math.min(c + PAGE_SIZE, items.length));
+          setCount((c) => Math.min(c + PAGE_SIZE, movies.length));
         }
       },
       { rootMargin: '300px 0px' }
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [items.length]);
+  }, [movies.length]);
 
-  if (!items || items.length === 0) {
+  if (!movies || movies.length === 0) {
     return <p className={styles.empty}>Nothing found yet.</p>;
   }
 
   return (
     <>
-      { }
       <div
         className={styles.grid}
         style={{
@@ -49,22 +48,20 @@ export default function MovieGrid({ items, onSelect, resetKey }: Props) {
         }}
       >
         {visible.map((m) => (
-          <div key={m.id} className={styles.card} onClick={() => onSelect?.(m)}>
-            {m.poster && (
+          <div key={m.id} className={styles.card} onClick={() => onSelect(m)}>
+            {m.poster_path && (
               <img
                 className={styles.poster}
-                src={m.poster}
+                src={imgUrl(m.poster_path, 'w300')}
                 alt={m.title}
                 loading="lazy"
               />
             )}
             <div className={styles.title}>{m.title}</div>
-            {m.year && <div className={styles.meta}>{m.year}</div>}
+            {m.release_date && <div className={styles.meta}>{m.release_date.slice(0, 4)}</div>}
           </div>
         ))}
       </div>
-
-      { }
       <div ref={sentinelRef} className={styles.sentinel} />
     </>
   );
